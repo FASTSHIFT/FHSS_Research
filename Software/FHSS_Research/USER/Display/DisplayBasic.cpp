@@ -20,6 +20,9 @@ SCREEN_CLASS screen(
     SCREEN_CS_Pin, 
     SCREEN_DC_Pin, 
     SCREEN_RES_Pin
+    //,
+    //SCREEN_SCLK_Pin,
+    //SCREEN_MOSI_Pin
 );
 
 #if (USE_FPS_TEST == 1) 
@@ -39,14 +42,14 @@ extern "C" {
   */
 void Display_Init()
 {
-    /*背光关闭*/
-    Backlight_Init();
-    Backlight_SetValue(0);
-    
+    SysLog_Printf("Adafruit_ST7735 &screen = 0x%p", &screen);
     /*屏幕初始化*/
     screen.begin();
     screen.setRotation(0);
     screen.fillScreen(screen.Black);
+    
+    Backlight_Init();
+    Backlight_SetValue(1000);
     
 #if (USE_FPS_TEST == 1)
     Display_FPSTest();
@@ -65,7 +68,7 @@ void Display_Init()
     /*背光渐亮*/
     Backlight_SetGradual(1000, 100);
     
-    //lv_demo_benchmark();
+    lv_demo_benchmark();
     //lv_demo_stress();
     //lv_demo_widgets();
 }

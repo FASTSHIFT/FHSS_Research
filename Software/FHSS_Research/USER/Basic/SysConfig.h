@@ -3,7 +3,7 @@
 
 #define SYS_NAME              "FHSS_Research"
 #define SYS_HARDWARE_VERSION  "v1.0"
-#define SYS_SOFTWARE_VERSION  "v1.0"
+#define SYS_SOFTWARE_VERSION  "v1.1"
 
 /*¿ÕÒý½Å*/
 #define NULL_PIN            PD0
@@ -21,8 +21,8 @@
 
 /*NRF24L01-1*/
 #define NRF1_MOSI_Pin       PA0
-#define NRF1_MISO_Pin       PB1
-#define NRF1_SCK_Pin        PC13
+#define NRF1_MISO_Pin       PC13
+#define NRF1_SCK_Pin        PC15
 #define NRF1_CE_Pin         PA1
 #define NRF1_CSN_Pin        PA2
 #define NRF1_IRQ_Pin        PC14

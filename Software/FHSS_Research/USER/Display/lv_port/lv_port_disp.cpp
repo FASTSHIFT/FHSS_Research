@@ -36,7 +36,9 @@ static void disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *c
     disp_drv_p = disp;
 
     //screen.drawFastRGBBitmap(area->x1, area->y1, (uint16_t*)color_p, (area->x2 - area->x1 + 1), (area->y2 - area->y1 + 1));
-
+    //lv_disp_flush_ready(disp_drv_p);
+    //return;
+    
     int16_t w = (area->x2 - area->x1 + 1);
     int16_t h = (area->y2 - area->y1 + 1);
     uint32_t size = w * h * sizeof(lv_color_t);
@@ -49,8 +51,6 @@ static void disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *c
 
     /*DMA发送请求*/
     disp_spi_dma_send(color_p, size);
-
-//    lv_disp_flush_ready(disp_drv_p);/* tell lvgl that flushing is done */
 }
 
 extern "C" {
@@ -86,7 +86,7 @@ static void disp_spi_dma_init()
     DMA_InitStructure.DMA_Priority = DMA_PRIORITY_MEDIUM; //DMA通道 中优先级
     
     DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)lv_disp_buf1;  //DMA内存基地址
-    DMA_InitStructure.DMA_MemoryInc = DMA_MEMORYINC_DISABLE;  //内存地址寄存器不变
+    DMA_InitStructure.DMA_MemoryInc = DMA_MEMORYINC_ENABLE;  //内存地址寄存器不变
     DMA_InitStructure.DMA_MemoryDataWidth = DMA_MEMORYDATAWIDTH_BYTE; //数据宽度
     DMA_InitStructure.DMA_BufferSize = sizeof(lv_disp_buf1);  //DMA通道的DMA缓存的大小
     

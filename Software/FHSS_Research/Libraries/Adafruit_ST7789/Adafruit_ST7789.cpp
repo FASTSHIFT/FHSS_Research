@@ -1,30 +1,24 @@
-#include "Adafruit_ST7735.h"
+#include "Adafruit_ST7789.h"
 #include "SPI.h"
 
 #define TFT_SPI SPI
-#define TFT_WIDTH  128
-#define TFT_HEIGHT 64
 
 #if defined(__STM32__)
-#define TFT_RST_SET     GPIO_HIGH(rstport,rstpinmask)
 #define TFT_CS_SET      GPIO_HIGH(csport,cspinmask)
 #define TFT_RS_SET      GPIO_HIGH(rsport,rspinmask)
 #define TFT_SCK_SET     GPIO_HIGH(sckport,sckpinmask)
 #define TFT_MOSI_SET    GPIO_HIGH(mosiport,mosipinmask)
 
-#define TFT_RST_CLR     GPIO_LOW(rstport,rstpinmask)
 #define TFT_CS_CLR      GPIO_LOW(csport,cspinmask)
 #define TFT_RS_CLR      GPIO_LOW(rsport,rspinmask)
 #define TFT_SCK_CLR     GPIO_LOW(sckport,sckpinmask)
 #define TFT_MOSI_CLR    GPIO_LOW(mosiport,mosipinmask)
 #else
-#define TFT_RST_SET     digitalWrite(RST,HIGH)
 #define TFT_CS_SET      digitalWrite(CS,HIGH)
 #define TFT_RS_SET      digitalWrite(RS,HIGH)
 #define TFT_SCK_SET     digitalWrite(SCK,HIGH)
 #define TFT_MOSI_SET    digitalWrite(MOSI,HIGH)
 
-#define TFT_RST_CLR     digitalWrite(RST,LOW)
 #define TFT_CS_CLR      digitalWrite(CS,LOW)
 #define TFT_RS_CLR      digitalWrite(RS,LOW)
 #define TFT_SCK_CLR     digitalWrite(SCK,LOW)
@@ -32,16 +26,14 @@
 #endif
 
 
-Adafruit_ST7735::Adafruit_ST7735(uint8_t cs, uint8_t rs, uint8_t rst)
-    : Adafruit_GFX(TFT_WIDTH, TFT_HEIGHT)
+Adafruit_ST7789::Adafruit_ST7789(uint8_t cs, uint8_t rs, uint8_t rst)
+    : Adafruit_GFX(ST7789_TFTWIDTH, ST7789_TFTHEIGHT)
 {
     RST = rst;
     CS = cs;
     RS = rs;
 
 #if defined(__STM32__)
-    rstport = digitalPinToPort(RST);
-    rstpinmask = digitalPinToBitMask(RST);
     csport = digitalPinToPort(CS);
     cspinmask = digitalPinToBitMask(CS);
     rsport = digitalPinToPort(RS);
@@ -51,8 +43,8 @@ Adafruit_ST7735::Adafruit_ST7735(uint8_t cs, uint8_t rs, uint8_t rst)
     hwSPI = true;
 }
 
-Adafruit_ST7735::Adafruit_ST7735(uint8_t cs, uint8_t rs, uint8_t rst, uint8_t clk, uint8_t mosi)
-    : Adafruit_GFX(TFT_WIDTH, TFT_HEIGHT)
+Adafruit_ST7789::Adafruit_ST7789(uint8_t cs, uint8_t rs, uint8_t rst, uint8_t clk, uint8_t mosi)
+    : Adafruit_GFX(ST7789_TFTWIDTH, ST7789_TFTHEIGHT)
 {
     RST = rst;
     CS = cs;
@@ -61,8 +53,6 @@ Adafruit_ST7735::Adafruit_ST7735(uint8_t cs, uint8_t rs, uint8_t rst, uint8_t cl
     MOSI = mosi;
 
 #if defined(__STM32__)
-    rstport = digitalPinToPort(RST);
-    rstpinmask = digitalPinToBitMask(RST);
     csport = digitalPinToPort(CS);
     cspinmask = digitalPinToBitMask(CS);
     rsport = digitalPinToPort(RS);
@@ -76,12 +66,28 @@ Adafruit_ST7735::Adafruit_ST7735(uint8_t cs, uint8_t rs, uint8_t rst, uint8_t cl
     hwSPI = false;
 }
 
-void Adafruit_ST7735::begin()
+void Adafruit_ST7789::begin()
 {
-    pinMode(RST, OUTPUT);
+    pinMode(PA5, OUTPUT);
+    pinMode(PA7, OUTPUT);
+    digitalWrite(PA5, HIGH);
+    digitalWrite(PA7, HIGH);
+    
+    
+
     pinMode(CS, OUTPUT);
     pinMode(RS, OUTPUT);
-
+    pinMode(RST, OUTPUT);
+    digitalWrite(CS, HIGH);
+    digitalWrite(RS, HIGH);
+    digitalWrite(RST, HIGH);
+    
+    delay(200);
+    digitalWrite(RST, LOW);
+    delay(200);
+    digitalWrite(RST, HIGH);
+    delay(200);
+    
     if(hwSPI)
     {
         TFT_SPI.begin();
@@ -91,123 +97,89 @@ void Adafruit_ST7735::begin()
     {
         pinMode(SCK, OUTPUT);
         pinMode(MOSI, OUTPUT);
+        digitalWrite(SCK, HIGH);
+        digitalWrite(MOSI, HIGH);
     }
 
-    TFT_RST_CLR;
-    delay(200);
-    TFT_RST_SET;
-    delay(300);
-
-    writeCommand(0x11);//Sleep exit
-    delay_ms(120);
-
-    //ST7735R Frame Rate
-    writeCommand(0xB1);
-    writeData(0x01);
-    writeData(0x2C);
-    writeData(0x2D);
-
-    writeCommand(0xB2);
-    writeData(0x01);
-    writeData(0x2C);
-    writeData(0x2D);
-
-    writeCommand(0xB3);
-    writeData(0x01);
-    writeData(0x2C);
-    writeData(0x2D);
-    writeData(0x01);
-    writeData(0x2C);
-    writeData(0x2D);
-
-    writeCommand(0xB4); //Column inversion
-    writeData(0x07);
-
-    //ST7735R Power Sequence
-    writeCommand(0xC0);
-    writeData(0xA2);
-    writeData(0x02);
-    writeData(0x84);
-    writeCommand(0xC1);
-    writeData(0xC5);
-
-    writeCommand(0xC2);
-    writeData(0x0A);
+    //************* Start Initial Sequence **********//
+    writeCommand(0x36);
     writeData(0x00);
 
-    writeCommand(0xC3);
-    writeData(0x8A);
-    writeData(0x2A);
-    writeCommand(0xC4);
-    writeData(0x8A);
-    writeData(0xEE);
-
-    writeCommand(0xC5); //VCOM
-    writeData(0x0E);
-
-    //ST7735R Gamma Sequence
-    writeCommand(0xe0);
-    writeData(0x0f);
-    writeData(0x1a);
-    writeData(0x0f);
-    writeData(0x18);
-    writeData(0x2f);
-    writeData(0x28);
-    writeData(0x20);
-    writeData(0x22);
-    writeData(0x1f);
-    writeData(0x1b);
-    writeData(0x23);
-    writeData(0x37);
-    writeData(0x00);
-    writeData(0x07);
-    writeData(0x02);
-    writeData(0x10);
-
-    writeCommand(0xe1);
-    writeData(0x0f);
-    writeData(0x1b);
-    writeData(0x0f);
-    writeData(0x17);
-    writeData(0x33);
-    writeData(0x2c);
-    writeData(0x29);
-    writeData(0x2e);
-    writeData(0x30);
-    writeData(0x30);
-    writeData(0x39);
-    writeData(0x3f);
-    writeData(0x00);
-    writeData(0x07);
-    writeData(0x03);
-    writeData(0x10);
-
-    writeCommand(0x2a);
-    writeData(0x00);
-    writeData(0x00);
-    writeData(0x00);
-    writeData(0x7f);
-
-    writeCommand(0x2b);
-    writeData(0x00);
-    writeData(0x00);
-    writeData(0x00);
-    writeData(0x9f);
-
-    writeCommand(0xF0); //Enable test command
-    writeData(0x01);
-    writeCommand(0xF6); //Disable ram power save mode
-    writeData(0x00);
-
-    writeCommand(0x3A); //65k mode
+    writeCommand(0x3A);
     writeData(0x05);
 
-    writeCommand(0x29);//Display on
-    
-    setRotation(0);
+    writeCommand(0xB2);
+    writeData(0x0C);
+    writeData(0x0C);
+    writeData(0x00);
+    writeData(0x33);
+    writeData(0x33);
+
+    writeCommand(0xB7);
+    writeData(0x35);
+
+    writeCommand(0xBB);
+    writeData(0x19);
+
+    writeCommand(0xC0);
+    writeData(0x2C);
+
+    writeCommand(0xC2);
+    writeData(0x01);
+
+    writeCommand(0xC3);
+    writeData(0x12);
+
+    writeCommand(0xC4);
+    writeData(0x20);
+
+    writeCommand(0xC6);
+    writeData(0x0F);
+
+    writeCommand(0xD0);
+    writeData(0xA4);
+    writeData(0xA1);
+
+    writeCommand(0xE0);
+    writeData(0xD0);
+    writeData(0x04);
+    writeData(0x0D);
+    writeData(0x11);
+    writeData(0x13);
+    writeData(0x2B);
+    writeData(0x3F);
+    writeData(0x54);
+    writeData(0x4C);
+    writeData(0x18);
+    writeData(0x0D);
+    writeData(0x0B);
+    writeData(0x1F);
+    writeData(0x23);
+
+    writeCommand(0xE1);
+    writeData(0xD0);
+    writeData(0x04);
+    writeData(0x0C);
+    writeData(0x11);
+    writeData(0x13);
+    writeData(0x2C);
+    writeData(0x3F);
+    writeData(0x44);
+    writeData(0x51);
+    writeData(0x2F);
+    writeData(0x1F);
+    writeData(0x1F);
+    writeData(0x20);
+    writeData(0x23);
+
+    writeCommand(0x21);
+
+    writeCommand(0x11);
+
+    writeCommand(0x29);
 }
 
-void Adafruit_ST7735::spiWrite(uint8_t data)
+void Adafruit_ST7789::spiWrite(uint8_t data)
 {
     for(uint8_t i = 0; i < 8; i++)
     {
@@ -218,7 +190,7 @@ void Adafruit_ST7735::spiWrite(uint8_t data)
     }
 }
 
-void Adafruit_ST7735::writeCommand(uint8_t cmd)
+void Adafruit_ST7789::writeCommand(uint8_t cmd)
 {
     TFT_CS_CLR;
     TFT_RS_CLR;
@@ -229,7 +201,7 @@ void Adafruit_ST7735::writeCommand(uint8_t cmd)
     TFT_CS_SET;
 }
 
-void Adafruit_ST7735::writeData16(uint16_t data)
+void Adafruit_ST7789::writeData16(uint16_t data)
 {
     TFT_CS_CLR;
     TFT_RS_SET;
@@ -246,7 +218,7 @@ void Adafruit_ST7735::writeData16(uint16_t data)
     TFT_CS_SET;
 }
 
-void Adafruit_ST7735::writeData(uint8_t data)
+void Adafruit_ST7789::writeData(uint8_t data)
 {
     TFT_CS_CLR;
     TFT_RS_SET;
@@ -261,110 +233,103 @@ void Adafruit_ST7735::writeData(uint8_t data)
     TFT_CS_SET;
 }
 
-void Adafruit_ST7735::setRotation(uint8_t r)
+void Adafruit_ST7789::setRotation(uint8_t r)
 {
     rotation = r % 4;
     writeCommand(0x36);
     switch(rotation)
     {
     case 0:
-        _width = TFT_WIDTH;
-        _height = TFT_HEIGHT;
+        _width = ST7789_TFTWIDTH;
+        _height = ST7789_TFTHEIGHT;
 
-        writeData(0xC8);
+        writeData(0x00);
         break;
 
     case 1:
-        _width = TFT_WIDTH;
-        _height = TFT_HEIGHT;
+        _width = ST7789_TFTHEIGHT;
+        _height = ST7789_TFTWIDTH;
 
-        writeData(0x08);
+        writeData(0xC0);
         break;
 
     case 2:
-        _width = TFT_HEIGHT;
-        _height = TFT_WIDTH;
+        _width = ST7789_TFTWIDTH;
+        _height = ST7789_TFTHEIGHT;
 
-        writeData(0x78);
+        writeData(0x70);
         break;
 
     case 3:
-        _width = TFT_HEIGHT;
-        _height = TFT_WIDTH;
+        _width = ST7789_TFTHEIGHT;
+        _height = ST7789_TFTWIDTH;
 
-        writeData(0xA8);
+        writeData(0xA0);
         break;
     }
 }
 
-void Adafruit_ST7735::setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
+void Adafruit_ST7789::setAddrWindow(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 {
     switch(rotation)
     {
     case 0:
         writeCommand(0x2A);
-        writeData16(x0 + 2);
-        writeData16(x1 + 2);
+        writeData16(x0);
+        writeData16(x1);
 
         writeCommand(0x2B);
-        writeData16(y0 + 67);
-        writeData16(y1 + 67);
-
+        writeData16(y0);
+        writeData16(y1);
         break;
-
     case 1:
         writeCommand(0x2A);
-        writeData16(x0 + 2);
-        writeData16(x1 + 2);
+        writeData16(x0);
+        writeData16(x1);
 
         writeCommand(0x2B);
-        writeData16(y0 + 1);
-        writeData16(y1 + 1);
-
+        writeData16(y0 + 80);
+        writeData16(y1 + 80);
         break;
-
     case 2:
         writeCommand(0x2A);
-        writeData16(x0 + 1);
-        writeData16(x1 + 1);
+        writeData16(x0);
+        writeData16(x1);
 
         writeCommand(0x2B);
-        writeData16(y0 + 2);
-        writeData16(y1 + 2);
-
+        writeData16(y0);
+        writeData16(y1);
         break;
-
     case 3:
         writeCommand(0x2A);
-        writeData16(x0 + 67);
-        writeData16(x1 + 67);
+        writeData16(x0 + 80);
+        writeData16(x1 + 80);
 
         writeCommand(0x2B);
-        writeData16(y0 + 2);
-        writeData16(y1 + 2);
-    
+        writeData16(y0);
+        writeData16(y1);
         break;
     }
-    
+
     writeCommand(0x2C);
 }
 
-void Adafruit_ST7735::setCursor(int16_t x, int16_t y)
+void Adafruit_ST7789::setCursor(int16_t x, int16_t y)
 {
     cursor_x = x;
     cursor_y = y;
     if((x < 0) || (x >= _width) || (y < 0) || (y >= _height)) return;
-    setAddrWindow(x, y, x + 1, y + 1);
+    setAddrWindow(x, y, x, y);
 }
 
-void Adafruit_ST7735::drawPixel(int16_t x, int16_t y, uint16_t color)
+void Adafruit_ST7789::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
     if((x < 0) || (x >= _width) || (y < 0) || (y >= _height)) return;
-    setAddrWindow(x, y, x + 1, y + 1);
+    setAddrWindow(x, y, x, y);
     writeData16(color);
 }
 
-void Adafruit_ST7735::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
+void Adafruit_ST7789::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
 {
     // Rudimentary clipping
     if((x >= _width) || (y >= _height) || h < 1) return;
@@ -378,7 +343,7 @@ void Adafruit_ST7735::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t co
         writeData16(color);
 }
 
-void Adafruit_ST7735::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
+void Adafruit_ST7789::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
 {
     // Rudimentary clipping
     if((x >= _width) || (y >= _height) || w < 1) return;
@@ -392,7 +357,7 @@ void Adafruit_ST7735::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t co
         writeData16(color);
 }
 
-void Adafruit_ST7735::drawRGBBitmap(int16_t x, int16_t y, uint16_t *bitmap, int16_t w, int16_t h)
+void Adafruit_ST7789::drawRGBBitmap(int16_t x, int16_t y, uint16_t *bitmap, int16_t w, int16_t h)
 {
     if((x >= _width) || (y >= _height)) return;
 
@@ -460,7 +425,7 @@ void Adafruit_ST7735::drawRGBBitmap(int16_t x, int16_t y, uint16_t *bitmap, int1
 #define SPI_IS_TXE()                   (SPI_I2S_GET_FLAG(SPI_STS_TE))
 #define SPI_IS_BUSY()                  (SPI_I2S_GET_FLAG(SPI_STS_BSY))
 
-void Adafruit_ST7735::fillScreen(uint16_t color)
+void Adafruit_ST7789::fillScreen(uint16_t color)
 {
     setAddrWindow(0, 0, _width - 1, _height - 1);
     uint32_t size = _width * _height;
@@ -488,7 +453,7 @@ void Adafruit_ST7735::fillScreen(uint16_t color)
     }
 }
 
-void Adafruit_ST7735::drawFastRGBBitmap(int16_t x, int16_t y, uint16_t *bitmap, int16_t w, int16_t h)
+void Adafruit_ST7789::drawFastRGBBitmap(int16_t x, int16_t y, uint16_t *bitmap, int16_t w, int16_t h)
 {
     if(!hwSPI)
         return;

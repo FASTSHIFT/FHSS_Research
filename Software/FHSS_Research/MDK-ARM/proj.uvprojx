@@ -132,12 +132,12 @@
             <UseExternalTool>0</UseExternalTool>
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
-            <Capability>0</Capability>
-            <DriverSelection>-1</DriverSelection>
+            <Capability>1</Capability>
+            <DriverSelection>4096</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -384,6 +384,21 @@
               <FileName>main.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\USER\main.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Com</GroupName>
+          <Files>
+            <File>
+              <FileName>ComPrivate.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\USER\Com\ComPrivate.h</FilePath>
+            </File>
+            <File>
+              <FileName>ComBasic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\USER\Com\ComBasic.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1179,6 +1194,135 @@
               <FileName>lv_win.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Simulator\visual_studio_2017_sdl\lvgl\src\lv_widgets\lv_win.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>lv_examples</GroupName>
+          <GroupOption>
+            <CommonProperty>
+              <UseCPPCompiler>0</UseCPPCompiler>
+              <RVCTCodeConst>0</RVCTCodeConst>
+              <RVCTZI>0</RVCTZI>
+              <RVCTOtherData>0</RVCTOtherData>
+              <ModuleSelection>0</ModuleSelection>
+              <IncludeInBuild>2</IncludeInBuild>
+              <AlwaysBuild>2</AlwaysBuild>
+              <GenerateAssemblyFile>2</GenerateAssemblyFile>
+              <AssembleAssemblyFile>2</AssembleAssemblyFile>
+              <PublicsOnly>2</PublicsOnly>
+              <StopOnExitCode>11</StopOnExitCode>
+              <CustomArgument></CustomArgument>
+              <IncludeLibraryModules></IncludeLibraryModules>
+              <ComprImg>1</ComprImg>
+            </CommonProperty>
+            <GroupArmAds>
+              <Cads>
+                <interw>2</interw>
+                <Optim>0</Optim>
+                <oTime>2</oTime>
+                <SplitLS>2</SplitLS>
+                <OneElfS>2</OneElfS>
+                <Strict>2</Strict>
+                <EnumInt>2</EnumInt>
+                <PlainCh>2</PlainCh>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <wLevel>1</wLevel>
+                <uThumb>2</uThumb>
+                <uSurpInc>2</uSurpInc>
+                <uC99>2</uC99>
+                <uGnu>2</uGnu>
+                <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
+                <vShortEn>2</vShortEn>
+                <vShortWch>2</vShortWch>
+                <v6Lto>2</v6Lto>
+                <v6WtE>2</v6WtE>
+                <v6Rtti>2</v6Rtti>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Cads>
+              <Aads>
+                <interw>2</interw>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <thumb>2</thumb>
+                <SplitLS>2</SplitLS>
+                <SwStkChk>2</SwStkChk>
+                <NoWarn>2</NoWarn>
+                <uSurpInc>2</uSurpInc>
+                <useXO>2</useXO>
+                <uClangAs>2</uClangAs>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Aads>
+            </GroupArmAds>
+          </GroupOption>
+          <Files>
+            <File>
+              <FileName>img_cogwheel_alpha16.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\lv_examples\src\assets\img_cogwheel_alpha16.c</FilePath>
+            </File>
+            <File>
+              <FileName>img_cogwheel_argb.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\lv_examples\src\assets\img_cogwheel_argb.c</FilePath>
+            </File>
+            <File>
+              <FileName>img_cogwheel_chroma_keyed.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\lv_examples\src\assets\img_cogwheel_chroma_keyed.c</FilePath>
+            </File>
+            <File>
+              <FileName>img_cogwheel_indexed16.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\lv_examples\src\assets\img_cogwheel_indexed16.c</FilePath>
+            </File>
+            <File>
+              <FileName>img_cogwheel_rgb.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\lv_examples\src\assets\img_cogwheel_rgb.c</FilePath>
+            </File>
+            <File>
+              <FileName>img_hand.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\lv_examples\src\assets\img_hand.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_font_montserrat_12_compr_az.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\lv_examples\src\assets\lv_font_montserrat_12_compr_az.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_font_montserrat_16_compr_az.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\lv_examples\src\assets\lv_font_montserrat_16_compr_az.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_font_montserrat_28_compr_az.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\lv_examples\src\assets\lv_font_montserrat_28_compr_az.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_demo_benchmark.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\lv_examples\src\lv_demo_benchmark\lv_demo_benchmark.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_demo_widgets.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\lv_examples\src\lv_demo_widgets\lv_demo_widgets.c</FilePath>
             </File>
           </Files>
         </Group>

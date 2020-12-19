@@ -1,4 +1,5 @@
 #include "BSP.h"
+#include "Basic/CommonMacro.h"
 
 /*实例化按键对象*/
 ButtonEvent btOK;              //选择键
@@ -11,7 +12,7 @@ ButtonEvent btOK;              //选择键
   */
 static void Button_EventHandler(ButtonEvent* btn, int event)
 {
-    
+    SysLog_Printf("&btn = 0x%p, event = %d", btn, event);
 }
 
 /**
@@ -21,6 +22,8 @@ static void Button_EventHandler(ButtonEvent* btn, int event)
   */
 void Button_Init()
 {
+    SysLog_Printf("KEY_Pin = %d, &btOK = 0x%p", KEY_Pin, &btOK);
+    
     /*上拉输入*/
     pinMode(KEY_Pin, INPUT_PULLUP);
 
@@ -36,5 +39,5 @@ void Button_Init()
   */
 void Button_Update()
 {
-    btOK.EventMonitor(!digitalRead(KEY_Pin));
+    __IntervalExecute(btOK.EventMonitor(!digitalRead(KEY_Pin)), 10);
 }

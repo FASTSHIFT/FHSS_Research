@@ -3,6 +3,7 @@
 
 #include "Basic/SysConfig.h"
 #include "Arduino.h"
+#include "Basic/SysLog.h"
 
 /*Backlight*/
 void Backlight_Init();
@@ -27,5 +28,6 @@ typedef enum{
 }LED_Type;
 void LED_Init();
 void LED_SetEnable(LED_Type led, bool en);
+void LED_Test();
 
 #endif

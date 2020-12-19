@@ -22,7 +22,8 @@ static void Backlight_AnimCallback(void * obj, int16_t brightness)
 void Backlight_Init()
 {
     /*PWM初始化，1000级，20K频率*/
-    PWM_Init(BLK_Pin, 1000, 20000);
+    //PWM_Init(BLK_Pin, 1000, 20000);
+    pinMode(BLK_Pin, OUTPUT);
 }
 
 /**
@@ -33,6 +34,7 @@ void Backlight_Init()
 void Backlight_SetGradual(uint16_t target, uint16_t time)
 {
     lv_anim_t a;
+    lv_anim_init(&a);
     lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)Backlight_AnimCallback);
     lv_anim_set_var(&a, NULL);
     lv_anim_set_time(&a, time);
@@ -62,6 +64,7 @@ uint16_t Backlight_GetValue()
   */
 void Backlight_SetValue(int16_t val)
 {
-    val = constrain(val, 0, 1000);
-    analogWrite(BLK_Pin, val);
+    digitalWrite(BLK_Pin, val);
+    //val = constrain(val, 0, 1000);
+    //analogWrite(BLK_Pin, val);
 }

@@ -4,6 +4,7 @@
 /*Basic*/
 #include "Adafruit_ST7735/Adafruit_ST7735.h"
 #include "Basic/SysConfig.h"
+#include "Basic/SysLog.h"
 
 typedef Adafruit_ST7735 SCREEN_CLASS;
 
