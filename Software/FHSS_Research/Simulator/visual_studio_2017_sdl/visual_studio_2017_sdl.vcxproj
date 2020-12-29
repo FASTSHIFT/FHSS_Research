@@ -23,32 +23,32 @@
     <ProjectGuid>{6F59884D-4367-49A9-B6FD-BF60376873CE}</ProjectGuid>
     <RootNamespace>visualstudio2017sdl</RootNamespace>
     <ProjectName>lv_sim_visual_studio_sdl</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -141,6 +141,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="App\App.cpp" />
+    <ClCompile Include="App\BSP\BSP_Com.cpp" />
+    <ClCompile Include="App\Page\Common.cpp" />
+    <ClCompile Include="App\Page\Page_Main.cpp" />
+    <ClCompile Include="App\Page\StatusBar.cpp" />
     <ClCompile Include="lvgl/src/lv_misc/lv_debug.c" />
     <ClCompile Include="lvgl/src/lv_core/lv_disp.c" />
     <ClCompile Include="lvgl/src/lv_core/lv_group.c" />
@@ -404,6 +409,9 @@
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="App\App.h" />
+    <ClInclude Include="App\BSP\BSP.h" />
+    <ClInclude Include="App\Page\Page.h" />
     <ClInclude Include="lvgl/lvgl.h" />
     <ClInclude Include="lvgl/src/lv_api_map.h" />
     <ClInclude Include="lvgl/src/lv_conf_internal.h" />

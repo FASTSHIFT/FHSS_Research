@@ -1,14 +1,13 @@
 #include "Arduino.h"
 #include "Display/DisplayPrivate.h"
 #include "Com/ComPrivate.h"
-#include "BSP/BSP.h"
+#include "BSP/BSP_Hardware.h"
 
 void setup()
 {
     SysLog_Init();
     SysLog_Printf(SYS_NAME);
     Display_Init();
-    Button_Init();
     LED_Init();
     LED_Test();
     Com_Init();
@@ -17,7 +16,6 @@ void setup()
 void loop()
 {
     Display_Update();
-    Button_Update();
 }
 
 /**

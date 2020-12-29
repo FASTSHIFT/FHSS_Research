@@ -43,7 +43,7 @@
 /*读写寄存器到结构体*/
 #define REGREAD(reg)  REG2U8((REG_##reg))=SPI_Read(READ_REG+reg)
 #define REGWRITE(reg) SPI_RW_Reg(WRITE_REG+reg,REG2U8(REG_##reg))
-    
+
 
 /**
   * @brief  构造函数，传入连接的引脚编号，软件SPI方式
@@ -58,7 +58,7 @@ NRF_Basic::NRF_Basic(uint8_t mosi, uint8_t miso, uint8_t sck, uint8_t ce, uint8_
 {
     /*不使用硬件SPI*/
     hwSPI = false;
-    
+
     /*引脚编号传入*/
     MOSI_Pin = mosi;
     MISO_Pin = miso;
@@ -90,7 +90,7 @@ NRF_Basic::NRF_Basic(uint8_t mosi, uint8_t miso, uint8_t sck, uint8_t ce, uint8_
   * @retval 无
   */
 NRF_Basic::NRF_Basic(uint8_t ce, uint8_t csn)
-{    
+{
     /*使用硬件SPI*/
     hwSPI = true;
 
@@ -133,14 +133,14 @@ bool NRF_Basic::Init()
 
     pinMode(CE_Pin, OUTPUT);
     pinMode(CSN_Pin, OUTPUT);
-    
+
     NRF_CE_LOW();
     NRF_CSN_HIGH();
-    
+
     bool isRst = Reset();
     ClearFlag();
     SetDefault();
-    
+
     return (IsDetect() && isRst);
 }
 
@@ -176,10 +176,10 @@ void NRF_Basic::SetDefault()
     RF_AddressWidth = sizeof(RF_Address);//地址宽度5字节
     RF_TX_PloadWidth = 32;//发送数据包长度
     RF_RX_PloadWidth = 32;//接收数据包长度
-    
+
     /*RF Disable*/
     SetRF_Enable(false);
-    
+
     /*Configuration Register*/
     REG_CONFIG.MASK_RX_DR  = 0;
     REG_CONFIG.MASK_TX_DS  = 0;
@@ -189,29 +189,29 @@ void NRF_Basic::SetDefault()
     REG_CONFIG.PWR_UP      = 1;
     REG_CONFIG.PRIM_RX     = 1;
     REGWRITE(CONFIG);
-    
+
     /*Auto Acknowledgment*/
     SPI_RW_Reg(WRITE_REG + EN_AA, 0x01);
-    
+
     /*Enabled RX Addresses*/
     SPI_RW_Reg(WRITE_REG + EN_RXADDR, 0x01);
-    
+
     /*Channel*/
     SetFreqency(RF_Freq);
-    
+
     /*Rate*/
     SetSpeed(RF_Speed);
-    
+
     /*RF Power*/
     SetPower(RF_Power);
-    
+
     /*RF PayloadWidth*/
     SetPayloadWidth(RF_TX_PloadWidth, RF_RX_PloadWidth);
-    
+
     /*TX*/
     SPI_Write_Buf(WRITE_REG + TX_ADDR, RF_Address, RF_AddressWidth);
     SetAutoRetry(RF_AutoRetryDelay, RF_AutoRetryCount);
-    
+
     /*RX*/
     SPI_Write_Buf(WRITE_REG + RX_ADDR_P0, RF_Address, RF_AddressWidth);
     SPI_RW_Reg(WRITE_REG + RX_PW_P0, RF_RX_PloadWidth);
@@ -263,7 +263,7 @@ void NRF_Basic::SetAddress(uint8_t addr0, uint8_t addr1, uint8_t addr2, uint8_t 
   * @param  addr: 一个包含5个字节的数组的指针
   * @retval 无
   */
-void NRF_Basic::SetAddress(uint8_t* addr)
+void NRF_Basic::SetAddress(const uint8_t* addr)
 {
     SetAddress(addr[0], addr[1], addr[2], addr[3], addr[4]);
 }
@@ -316,6 +316,23 @@ void NRF_Basic::SetFreqency(uint8_t freq)
 }
 
 /**
+  * @brief  设置中断使能
+  * @param  max_rt:发送超时中断
+  * @param  tx_ds:发送成功
+  * @param  rx_dr:接收成功
+  * @retval 无
+  */
+void NRF_Basic::SetIRQEnable(bool max_rt, bool tx_ds, bool rx_dr)
+{
+    NRF_CE_LOW();
+    REG_CONFIG.MASK_MAX_RT = !max_rt;
+    REG_CONFIG.MASK_TX_DS = !tx_ds;
+    REG_CONFIG.MASK_RX_DR = !rx_dr;
+    REGWRITE(CONFIG);
+    SetRF_Enable(RF_Enabled);
+}
+
+/**
   * @brief  设置自动重发总时间
   * @param  timeMs:时间
   * @retval 无
@@ -334,7 +351,7 @@ void NRF_Basic::SetAutoRetryTimeout(uint16_t timeMs)
     {
         byteTimeUs = 4;
     }
-    
+
     //Preamble 1 byte
     //Address 3-5 byte
     //Packet Control Field 9 bit
@@ -359,7 +376,7 @@ void NRF_Basic::SetAutoRetryTimeoutWithTest(uint16_t timeMs)
     uint8_t addrBackup[5];
     uint8_t RF_State_Backup = RF_State;
     uint8_t tx_buff[32];
-    
+
     NRF_CE_LOW();
     GetAddress(addrBackup);
     SetAddress(0xAA, 0xBB, 0xCC, 0xDD, 0xEE);
@@ -371,10 +388,10 @@ void NRF_Basic::SetAutoRetryTimeoutWithTest(uint16_t timeMs)
         uint32_t timeCost = 0;
         noInterrupts();
         uint32_t start = micros();
-        while(TranCheck() == 0){};
+        while(TranCheck() == 0) {};
         timeCost = micros() - start;
         interrupts();
-        
+
         if(timeCost <= timeUs || retryCount < 1)
         {
             break;
@@ -386,7 +403,7 @@ void NRF_Basic::SetAutoRetryTimeoutWithTest(uint16_t timeMs)
             NRF_CE_HIGH();
         }
     }
-    if(RF_State_Backup == State_RX)
+    if(RF_State_Backup == RF_State_RX)
     {
         RX_Mode();
     }
@@ -407,7 +424,7 @@ void NRF_Basic::SetAutoRetry(uint8_t delay, uint8_t count)
     REG_SETUP_RETR.ARD = RF_AutoRetryDelay = delay;
     REG_SETUP_RETR.ARC = RF_AutoRetryCount = count;
     REGWRITE(SETUP_RETR);
-    
+
     /* 250Kbps = 32us/Byte  */
     uint8_t byteTimeUs = 32;
     /* 1Mbps = 8us/Byte */
@@ -422,7 +439,7 @@ void NRF_Basic::SetAutoRetry(uint8_t delay, uint8_t count)
     }
     uint16_t packByte = 1 + RF_AddressWidth + (9 / 8) + RF_TX_PloadWidth + (REG_CONFIG.CRCO + 1);
     uint32_t packTimeUs = packByte * byteTimeUs;
-    
+
     RF_TimeoutUs = (packTimeUs + (delay + 1) * 250) * count;
     SetRF_Enable(RF_Enabled);
 }
@@ -510,7 +527,7 @@ uint8_t NRF_Basic::GetSpeed()
         speed = 1;
     else if(RF_Speed == SPEED_2Mbps)
         speed = 2;
-    
+
     return speed;
 }
 
@@ -616,20 +633,24 @@ void NRF_Basic::ClearFlag()
   */
 bool NRF_Basic::IsDetect()
 {
-    uint8_t detect = true;
-    uint8_t addr[sizeof(RF_Address)] = {0};
-    memcpy(addr, RF_Address, sizeof(addr));
-    SetAddress(0, 1, 2, 3, 4);
-    GetAddress(RF_Address);
-    for(uint8_t i = 0;i < RF_AddressWidth;i++)
-    {
-        if(RF_Address[i] != i)
-        {
-            detect = false;
-        }
-    }
-    SetAddress(addr);
+    uint8_t detect = false;
+    uint8_t addrBkup[sizeof(RF_Address)] = {0};
+    const uint8_t addrTest[sizeof(RF_Address)] = {
+        0x55, 0xAA, 0x55, 0xAA, 0x55
+    };
     
+    memcpy(addrBkup, RF_Address, sizeof(addrBkup));
+    
+    SetAddress(addrTest);
+    GetAddress(RF_Address);
+    
+    if(memcmp(RF_Address, addrTest, sizeof(RF_Address)) == 0)
+    {
+        detect = true;
+    }
+    
+    SetAddress(addrBkup);
+
     return detect;
 }
 
@@ -674,18 +695,18 @@ uint8_t NRF_Basic::SPI_Read_Buf(uint8_t reg, uint8_t *pBuf, uint8_t bytes)
   */
 void NRF_Basic::TX_Mode(bool rfDelay)
 {
-    RF_State = State_TX;
-    
+    RF_State = RF_State_TX;
+
     NRF_CE_LOW();
     ClearFlag();
     REG_CONFIG.PRIM_RX = 0;
     REGWRITE(CONFIG);
-    
+
     if(rfDelay)
     {
         delayMicroseconds(130);
     }
-    
+
     SetRF_Enable(RF_Enabled);
 }
 
@@ -696,18 +717,18 @@ void NRF_Basic::TX_Mode(bool rfDelay)
   */
 void NRF_Basic::RX_Mode(bool rfDelay)
 {
-    RF_State = State_RX;
-    
+    RF_State = RF_State_RX;
+
     NRF_CE_LOW();
     ClearFlag();
     REG_CONFIG.PRIM_RX = 1;
     REGWRITE(CONFIG);
-    
+
     if(rfDelay)
     {
         delayMicroseconds(130);
     }
-    
+
     SetRF_Enable(RF_Enabled);
 }
 
@@ -739,8 +760,8 @@ void NRF_Basic::SetPowerUp(bool en)
   * @param  *txbuff:发送缓冲区地址
   * @retval 无
   */
-void NRF_Basic::Tran(void* txbuff)
-{  
+void NRF_Basic::Tran(const void* txbuff)
+{
     /*清标志位*/
     ClearFlag();
     /*清缓冲区*/
@@ -748,7 +769,7 @@ void NRF_Basic::Tran(void* txbuff)
     /*发送数据*/
     SPI_Write_Buf(W_TX_PLOAD, (uint8_t*)txbuff, RF_TX_PloadWidth);
     /*发送计数++*/
-    RF_TranCnt++;
+    CntTxCom++;
 }
 
 /**
@@ -767,13 +788,14 @@ int8_t NRF_Basic::TranCheck()
         /*是否超时*/
         if(REG_STATUS.MAX_RT)
         {
+            CntTxMaxRT++;
             retval = -1;
         }
         /*是否发送成功*/
         else if(REG_STATUS.TX_DS)
         {
             /*发送成功计数++*/
-            RF_TranSuccessCnt ++;
+            CntTxSuccess ++;
             retval = 1;
         }
         /*清状态寄存器标志位*/
@@ -792,7 +814,7 @@ bool NRF_Basic::Recv(void* rxbuff)
     bool retval = false;
     /*读取状态寄存器*/
     REGREAD(STATUS);
-    
+
     /*是否接收成功*/
     if(REG_STATUS.RX_DR)
     {
@@ -802,28 +824,28 @@ bool NRF_Basic::Recv(void* rxbuff)
         SPI_RW_Reg(FLUSH_RX, 0);
         /*清状态寄存器标志位*/
         REGWRITE(STATUS);
-        
+
         retval = true;
-    }    
+    }
     return retval;
 }
 
 /**
-  * @brief  获取信号强度(发送成功率)
+  * @brief  获取发送丢包率
   * @param  无
-  * @retval 信号强度(0~100%)
+  * @retval 丢包率(0~100%)
   */
-uint8_t NRF_Basic::GetRSSI()
+uint8_t NRF_Basic::GetTxPackLoss()
 {
-    if(RF_TranCnt == 0) return 0;
+    if(CntTxCom == 0) return 0;
 
     /*发送成功次数 除以 发送总次数 * 100% */
-    int rssi = RF_TranSuccessCnt * 100 / RF_TranCnt;
-    
-    if(rssi > 100)
-        rssi = 100;
-    
-    RF_TranSuccessCnt = RF_TranCnt = 0;
-    RF_RSSI = rssi;
-    return rssi;
+    int success = CntTxSuccess * 100 / CntTxCom;
+
+    if(success > 100)
+        success = 100;
+
+    CntTxSuccess = CntTxCom = CntTxMaxRT = 0;
+    TxPackLoss = 100 - success;
+    return TxPackLoss;
 }

@@ -1,5 +1,7 @@
-#ifndef __BSP_H
-#define __BSP_H
+#ifndef __BSP_HARDWARE_H
+#define __BSP_HARDWARE_H
+
+#include "app/BSP/BSP.h"
 
 #include "Basic/SysConfig.h"
 #include "Arduino.h"
@@ -12,12 +14,6 @@ void Backlight_SetValue(int16_t val);
 void Backlight_SetGradual(uint16_t target, uint16_t time = 500);
 void Backlight_UpdateBKP(void);
 uint16_t Backlight_GetBKP(void);
-
-/*Buttons*/
-#include "ButtonEvent/ButtonEvent.h"
-extern ButtonEvent btOK;
-void Button_Init();
-void Button_Update();
 
 /*LED*/
 typedef enum{

@@ -1,8 +1,10 @@
-#include "BSP.h"
+#include "BSP_Hardware.h"
+#include "ButtonEvent/ButtonEvent.h"
 #include "Basic/CommonMacro.h"
+#include "Com/ComPrivate.h"
 
 /*实例化按键对象*/
-ButtonEvent btOK;              //选择键
+static ButtonEvent btOK;
 
 /**
   * @brief  按键事件回调处理
@@ -12,7 +14,11 @@ ButtonEvent btOK;              //选择键
   */
 static void Button_EventHandler(ButtonEvent* btn, int event)
 {
-    SysLog_Printf("&btn = 0x%p, event = %d", btn, event);
+    //SysLog_Printf("&btn = 0x%p, event = %d", btn, event);
+    if(event == ButtonEvent::EVENT_ButtonLongPressed)
+    {
+        ComTest_SetMaster(!ComTest_GetIsMaster());
+    }
 }
 
 /**
@@ -27,7 +33,6 @@ void Button_Init()
     /*上拉输入*/
     pinMode(KEY_Pin, INPUT_PULLUP);
 
-    
     /*关联事件*/
     btOK.EventAttach(Button_EventHandler);
 }

@@ -378,57 +378,42 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>USER</GroupName>
+          <GroupName>App</GroupName>
           <Files>
             <File>
-              <FileName>main.cpp</FileName>
+              <FileName>App.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\App\App.h</FilePath>
+            </File>
+            <File>
+              <FileName>App.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\USER\main.cpp</FilePath>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\App\App.cpp</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>Com</GroupName>
+          <GroupName>BSP</GroupName>
           <Files>
             <File>
-              <FileName>ComPrivate.h</FileName>
+              <FileName>BSP.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\USER\Com\ComPrivate.h</FilePath>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\app\bsp\BSP.h</FilePath>
             </File>
             <File>
-              <FileName>ComBasic.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\USER\Com\ComBasic.cpp</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>NRF</GroupName>
-          <Files>
-            <File>
-              <FileName>NRF.h</FileName>
+              <FileName>BSP_Hardware.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Libraries\NRF\NRF.h</FilePath>
+              <FilePath>..\USER\BSP\BSP_Hardware.h</FilePath>
             </File>
             <File>
-              <FileName>NRF_Reg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Libraries\NRF\NRF_Reg.h</FilePath>
-            </File>
-            <File>
-              <FileName>NRF_Basic.cpp</FileName>
+              <FileName>BSP_Backlight.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\Libraries\NRF\NRF_Basic.cpp</FilePath>
+              <FilePath>..\USER\BSP\BSP_Backlight.cpp</FilePath>
             </File>
             <File>
-              <FileName>NRF_FHSS.cpp</FileName>
+              <FileName>BSP_LED.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\Libraries\NRF\NRF_FHSS.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>NRF_TRM.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\Libraries\NRF\NRF_TRM.cpp</FilePath>
+              <FilePath>..\USER\BSP\BSP_LED.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -448,27 +433,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>BSP</GroupName>
+          <GroupName>Com</GroupName>
           <Files>
             <File>
-              <FileName>BSP.h</FileName>
+              <FileName>ComPrivate.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\USER\BSP\BSP.h</FilePath>
+              <FilePath>..\USER\Com\ComPrivate.h</FilePath>
             </File>
             <File>
-              <FileName>BSP_Backlight.cpp</FileName>
+              <FileName>ComBasic.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\USER\BSP\BSP_Backlight.cpp</FilePath>
+              <FilePath>..\USER\Com\ComBasic.cpp</FilePath>
             </File>
             <File>
-              <FileName>BSP_Button.cpp</FileName>
+              <FileName>ComTest.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\USER\BSP\BSP_Button.cpp</FilePath>
+              <FilePath>..\USER\Com\ComTest.cpp</FilePath>
             </File>
             <File>
-              <FileName>BSP_LED.cpp</FileName>
+              <FileName>ComMaster.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\USER\BSP\BSP_LED.cpp</FilePath>
+              <FilePath>..\USER\Com\ComMaster.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>ComSlave.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\USER\Com\ComSlave.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -555,6 +545,76 @@
               <FileName>lv_port_log.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\USER\Display\lv_port\lv_port_log.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>lv_port_indev.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\USER\Display\lv_port\lv_port_indev.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Page</GroupName>
+          <Files>
+            <File>
+              <FileName>Page.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\App\Page\Page.h</FilePath>
+            </File>
+            <File>
+              <FileName>Common.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\App\Page\Common.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>StatusBar.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\App\Page\StatusBar.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Page_Main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Simulator\visual_studio_2017_sdl\App\Page\Page_Main.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>USER</GroupName>
+          <Files>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\USER\main.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>NRF</GroupName>
+          <Files>
+            <File>
+              <FileName>NRF.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Libraries\NRF\NRF.h</FilePath>
+            </File>
+            <File>
+              <FileName>NRF_Reg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Libraries\NRF\NRF_Reg.h</FilePath>
+            </File>
+            <File>
+              <FileName>NRF_Basic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Libraries\NRF\NRF_Basic.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>NRF_Manager.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Libraries\NRF\NRF_Manager.h</FilePath>
+            </File>
+            <File>
+              <FileName>NRF_Manager.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Libraries\NRF\NRF_Manager.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1206,7 +1266,7 @@
               <RVCTZI>0</RVCTZI>
               <RVCTOtherData>0</RVCTOtherData>
               <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>2</IncludeInBuild>
+              <IncludeInBuild>0</IncludeInBuild>
               <AlwaysBuild>2</AlwaysBuild>
               <GenerateAssemblyFile>2</GenerateAssemblyFile>
               <AssembleAssemblyFile>2</AssembleAssemblyFile>

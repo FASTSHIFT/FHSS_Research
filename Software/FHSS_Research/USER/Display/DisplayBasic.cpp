@@ -1,17 +1,6 @@
 #include "DisplayPrivate.h"
-#include "BSP/BSP.h"
-
-/**
-  * @brief  通用显示初始化
-  * @param  无
-  * @retval 无
-  */
-static void Display_CommonInit()
-{
-    /*自定义主题初始化*/
-}
-
-#ifdef ARDUINO
+#include "BSP/BSP_Hardware.h"
+#include "App/App.h"
 
 #define USE_FPS_TEST 0
 
@@ -61,14 +50,15 @@ void Display_Init()
     /*lvgl初始化*/
     lv_init();
     lv_port_disp_init();
+    lv_port_indev_init();
     lv_port_log_init();
-    
-    Display_CommonInit();
     
     /*背光渐亮*/
     Backlight_SetGradual(1000, 100);
     
-    lv_demo_benchmark();
+    App_Create();
+    
+    //lv_demo_benchmark();
     //lv_demo_stress();
     //lv_demo_widgets();
 }
@@ -100,15 +90,6 @@ static void Display_FPSTest()
     screen.print(FPS);
     while(1);
 }
-#endif
-
-#else
-
-void Display_Init()
-{
-    Display_CommonInit();
-}
-
 #endif
 
 void Display_Update()

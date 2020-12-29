@@ -304,8 +304,8 @@ typedef void * lv_img_decoder_user_data_t;
 #  define LV_TICK_CUSTOM_INCLUDE  "Arduino.h"         /*Header for the system time function*/
 #  define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())     /*Expression evaluating to current system time in ms*/
 #else
-#  define LV_TICK_CUSTOM_INCLUDE  <Windows.h>          /*Header for the system time function*/
-#  define LV_TICK_CUSTOM_SYS_TIME_EXPR (GetTickCount())/*Expression evaluating to current system time in ms*/
+#  define LV_TICK_CUSTOM_INCLUDE  <time.h>          /*Header for the system time function*/
+#  define LV_TICK_CUSTOM_SYS_TIME_EXPR (clock())/*Expression evaluating to current system time in ms*/
 #endif
 #endif   /*LV_TICK_CUSTOM*/
 

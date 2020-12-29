@@ -1,5 +1,5 @@
 #include "Display/DisplayPrivate.h"
-#include "BSP.h"
+#include "BSP_Hardware.h"
 
 #define BLK_Pin SCREEN_BLK_Pin
 
