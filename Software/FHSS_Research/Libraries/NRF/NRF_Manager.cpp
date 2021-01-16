@@ -17,7 +17,7 @@ NRF_Manager::NRF_Manager(NRF_Basic* nrf)
     FH_WaitTime = 0;
 
     LastRxTime = 0;
-    IntervalTime = 10;
+    IntervalTime = 5;
 
     Role = Role_Master;
     Mode = Mode_Simplex;
@@ -52,6 +52,7 @@ void NRF_Manager::SetRole(Role_Type role)
 void NRF_Manager::SetMode(Mode_Type mode)
 {
     Mode = mode;
+    SetRole(Role);
 }
 
 void NRF_Manager::SetTxBuffer(void* txbuff, uint16_t len)
@@ -270,6 +271,7 @@ void NRF_Manager::SlaveDuplexHandle()
             TxReq = true;
             CntRxCom++;
             CntRxForceFH++;
+            FH_LastTime = millis();
             FH_WaitTime = IntervalTime * 2;
         }
         else if(GetTickElaps(LastRxTime) >= (IntervalTime * 2) * (FH_List_Length + 1))
@@ -281,7 +283,7 @@ void NRF_Manager::SlaveDuplexHandle()
             FH_WaitResync = true;
         }
         
-        if(TxReq && GetTickElaps(LastRxTime) >= IntervalTime)
+        if(TxReq && GetTickElaps(LastRxTime) > IntervalTime)
         {
             TxReq = false;
             Basic->TX_Mode();
@@ -292,8 +294,7 @@ void NRF_Manager::SlaveDuplexHandle()
     }
     else if(Basic->RF_State == Basic->RF_State_TX)
     {
-        if(
-            status & Basic->TX_DS || 
+        if( status & Basic->TX_DS || 
             status & Basic->MAX_RT ||
             GetTickElaps(LastTxTime) >= (IntervalTime - 1)
         )
@@ -313,7 +314,7 @@ void NRF_Manager::SlaveDuplexHandle()
 
 void NRF_Manager::Handle()
 {
-    LED_SetEnable(LED_STA2, true);
+    LED_SetEnable(LED_STA2, (Basic->RF_State == Basic->RF_State_TX));
 
     if(Role == Role_Master)
     {
@@ -337,7 +338,6 @@ void NRF_Manager::Handle()
             SlaveDuplexHandle();
         }
     }
-    LED_SetEnable(LED_STA2, false);
 }
 
 void NRF_Manager::IRQ_Handle()
