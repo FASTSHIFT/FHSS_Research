@@ -845,7 +845,13 @@ uint8_t NRF_Basic::GetTxPackLoss()
     if(success > 100)
         success = 100;
 
-    CntTxSuccess = CntTxCom = CntTxMaxRT = 0;
     TxPackLoss = 100 - success;
     return TxPackLoss;
+}
+
+void NRF_Basic::ResetTxCnts()
+{
+    CntTxSuccess = 0;
+    CntTxCom = 0;
+    CntTxMaxRT = 0;
 }

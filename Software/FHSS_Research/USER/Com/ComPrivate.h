@@ -18,7 +18,6 @@ extern uint8_t NRF2_RxBuff[COM_BUFFER_LEN];
 bool Com_Init();
 
 void ComTest_Init();
-void ComTset_Update();
 
 void ComMasterTest();
 void ComSlaveTest();

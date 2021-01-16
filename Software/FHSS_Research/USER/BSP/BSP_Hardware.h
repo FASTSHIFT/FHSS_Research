@@ -24,6 +24,7 @@ typedef enum{
 }LED_Type;
 void LED_Init();
 void LED_SetEnable(LED_Type led, bool en);
+void LED_SetToggle(LED_Type led);
 void LED_Test();
 
 #endif

@@ -1,11 +1,13 @@
 #include "BSP.h"
 
-static bool isMaster = true;
+static bool IsMaster = true;
+static bool IsFHSS_Enable = true;
+static bool IsDuplexMode = false;
 
 uint8_t ComTest_GetRxData(int index)
 {
     static uint8_t data;
-    return data++;
+    return data--;
 }
 
 uint8_t ComTest_GetTxData(int index)
@@ -16,17 +18,18 @@ uint8_t ComTest_GetTxData(int index)
 
 void ComTest_SetMaster(bool en)
 {
-    isMaster = en;
+    IsMaster = en;
 }
 
 bool ComTest_GetIsMaster()
 {
-    return isMaster;
+    return IsMaster;
 }
 
-uint8_t ComSlave_GetPackLoss()
+void ComTest_GetPackLoss(uint8_t* txLoss, uint8_t* rxLoss)
 {
-    return 50;
+    *txLoss = 50;
+    *rxLoss = 50;
 }
 
 void ComSlave_GetCnts(uint32_t* rxSuc, uint32_t* forceFH, uint32_t* resync)
@@ -39,4 +42,35 @@ void ComSlave_GetCnts(uint32_t* rxSuc, uint32_t* forceFH, uint32_t* resync)
 void ComSlave_ResetCnts()
 {
     
+}
+
+void ComTest_GetTxRxCnts(uint32_t* txCnt, uint32_t* rxCnt)
+{
+    *txCnt = 100;
+    *rxCnt = 100;
+}
+
+bool ComTest_GetFHSS_Enable()
+{
+    return IsFHSS_Enable;
+}
+
+void ComTest_SetFHSS_Enable(bool en)
+{
+    IsFHSS_Enable = en;
+}
+
+bool ComTest_GetIsDuplexMode()
+{
+    return IsDuplexMode;
+}
+
+void ComTest_SetDuplexMode(bool en)
+{
+    IsDuplexMode = en;
+}
+
+void ComTest_ResetCnts()
+{
+
 }

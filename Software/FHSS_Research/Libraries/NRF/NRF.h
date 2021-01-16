@@ -146,6 +146,7 @@ public:
     uint8_t GetPower();
     uint8_t GetStatus();
     uint8_t GetTxPackLoss();
+    void ResetTxCnts();
     uint8_t GetRF_State()
     {
         return RF_State;

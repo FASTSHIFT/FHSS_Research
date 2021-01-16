@@ -5,6 +5,7 @@
 
 class NRF_Manager
 {
+    typedef void(*TimeSetCallbackFunc_t)(uint32_t);
 public:
     NRF_Manager(NRF_Basic* nrf);
     NRF_Basic* Basic;
@@ -34,25 +35,29 @@ public:
     void SetFH_Enable(bool en);
     void SetRole(Role_Type role);
     void SetMode(Mode_Type mode);
-    void SetTxBuffer(const void* txbuff, uint16_t len);
+    void SetTxBuffer(void* txbuff, uint16_t len);
     void SetRxBuffer(void* rxbuff, uint16_t len);
     void SetFreqHoppingList(const uint8_t* list, uint16_t length);
+    void SetInterruptTimeCallback(TimeSetCallbackFunc_t func);
 
+    bool GetFH_Enable();
     void GetRxCnts(uint32_t* rxSuc, uint32_t* forceFH, uint32_t* resync);
     uint8_t GetRxPackLoss();
+    uint32_t GetTickElaps(uint32_t prevTick);
     void ResetRxCnts();
     
     void Handle();
     void IRQ_Handle();
 
 private:
-    bool IsHandling;
-
     uint16_t IntervalTime;
     uint32_t LastRxTime;
+    uint32_t LastTxTime;
     
-    const uint8_t* TxBuffer;
+    uint8_t* TxBuffer;
     uint8_t* RxBuffer;
+
+    bool TxReq;
 
     bool FH_Enable;
     bool FH_WaitResync;

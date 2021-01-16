@@ -22,7 +22,7 @@ static bool Com_DefaultInit(NRF_Basic* nrf)
     nrf->SetPayloadWidth(COM_BUFFER_LEN, COM_BUFFER_LEN);
     
     /*设置速率*/
-    nrf->SetSpeed(NRF_Basic::SPEED_1Mbps);
+    nrf->SetSpeed(NRF_Basic::SPEED_2Mbps);
     
     /*设置频率*/
     nrf->SetFreqency(24);

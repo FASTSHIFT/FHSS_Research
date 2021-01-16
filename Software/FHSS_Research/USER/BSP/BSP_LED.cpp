@@ -32,3 +32,8 @@ void LED_SetEnable(LED_Type led, bool en)
 {
     digitalWrite(LED_Pin_Grp[led], en);
 }
+
+void LED_SetToggle(LED_Type led)
+{
+    togglePin(LED_Pin_Grp[led]);
+}

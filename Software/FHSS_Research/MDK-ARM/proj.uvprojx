@@ -450,16 +450,6 @@
               <FileType>8</FileType>
               <FilePath>..\USER\Com\ComTest.cpp</FilePath>
             </File>
-            <File>
-              <FileName>ComMaster.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\USER\Com\ComMaster.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>ComSlave.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\USER\Com\ComSlave.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
