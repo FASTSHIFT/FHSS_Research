@@ -9,5 +9,4 @@ Research on Frequency-Hopping Spread Spectrum protocol,Simplex and duplex freque
 > Low: RX Mode
 
 ## HARDWARE
-![image](https://github.com/FASTSHIFT/FHSS_Research/blob/main/Image/hardware.jpg)
-
+![image](https://github.com/FASTSHIFT/FHSS_Research/blob/main/Image/test_fhss_duplex.jpg)
