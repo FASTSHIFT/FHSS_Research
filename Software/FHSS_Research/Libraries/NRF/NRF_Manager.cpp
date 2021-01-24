@@ -31,28 +31,20 @@ void NRF_Manager::SetFH_Enable(bool en)
     if(!FH_Enable && FH_List != NULL)
     {
         FH_List_Index = 0;
-        Basic->SetFreqency(FH_List[FH_List_Index]);
+        ModeUpdateReq = true;
     }
 }
 
 void NRF_Manager::SetRole(Role_Type role)
 {
     Role = role;
-
-    if(Role == Role_Master)
-    {
-        Basic->TX_Mode(true);
-    }
-    else if(Role == Role_Slave)
-    {
-        Basic->RX_Mode(true);
-    }
+    ModeUpdateReq = true;
 }
 
 void NRF_Manager::SetMode(Mode_Type mode)
 {
     Mode = mode;
-    SetRole(Role);
+    ModeUpdateReq = true;
 }
 
 void NRF_Manager::SetTxBuffer(void* txbuff, uint16_t len)
@@ -95,7 +87,8 @@ void NRF_Manager::ResetRxCnts()
 
 uint8_t NRF_Manager::GetRxPackLoss()
 {
-    if(CntRxCom == 0) return 0;
+    if(CntRxCom == 0)
+        return 0;
 
     return (100 - 100 * CntRxSuccess / CntRxCom);
 }
@@ -103,6 +96,20 @@ uint8_t NRF_Manager::GetRxPackLoss()
 bool NRF_Manager::GetFH_Enable()
 {
     return FH_Enable;
+}
+
+uint16_t NRF_Manager::GetFH_TraverseTime()
+{
+    if(Mode == Mode_Simplex)
+    {
+        return (IntervalTime * FH_List_Length);
+    }
+    else if(Mode == Mode_Duplex)
+    {
+        return (IntervalTime * 2 * FH_List_Length);
+    }
+    
+    return 0;
 }
 
 uint32_t NRF_Manager::GetTickElaps(uint32_t prevTick)
@@ -136,22 +143,17 @@ void NRF_Manager::FH_JumpNext()
         return;
     }
 
-    
-    LED_SetToggle(LED_STA1);
-    
     FH_List_Index++;
     FH_List_Index %= FH_List_Length;
     Basic->SetFreqency(FH_List[FH_List_Index]);
-    
-    //LED_SetEnable(LED_STA1, false);
+
+    LED_SetToggle(LED_STA1);
 }
 
 void NRF_Manager::MasterSimplexHandle()
 {
     if(GetTickElaps(LastTxTime) < IntervalTime)
-    {
         return;
-    }
     
     LastTxTime = millis();
     
@@ -163,7 +165,7 @@ void NRF_Manager::MasterSimplexHandle()
     /*发射端跳频*/
     FH_JumpNext();
 
-    /*再发送(不管接收端状态)*/
+    /*直接发送(不管从机状态)*/
     Basic->Tran(TxBuffer);
 
     LED_SetEnable(LED_TX, false);
@@ -171,8 +173,6 @@ void NRF_Manager::MasterSimplexHandle()
 
 void NRF_Manager::SlaveSimplexHandle()
 {
-    uint32_t tick = millis();
-
     /*如果正常接收，则下一次正常跳频*/
     if(Basic->Recv(RxBuffer))
     {
@@ -180,7 +180,9 @@ void NRF_Manager::SlaveSimplexHandle()
         
         CntRxCom++;
         CntRxSuccess++;
-        LastRxTime = tick;
+        LastRxTime = millis();
+        
+        /*下一个频点的中间*/
         FH_WaitTime = IntervalTime + IntervalTime / 2 + 1;
         
         FH_JumpNext();
@@ -198,22 +200,27 @@ void NRF_Manager::SlaveSimplexHandle()
     /*在丢失信号超时后，接收端关闭正常跳频*/
     /*慢跳等待重新同步发射端，慢跳周期大于发端遍历跳频表的周期*/
     /*一旦接收成功，立即启动正常跳频*/
-    else if(GetTickElaps(LastRxTime) >= IntervalTime * (FH_List_Length + 1))
+    else if(GetTickElaps(LastRxTime) > GetFH_TraverseTime())
     {
+        FH_WaitResync = true;
+        
+        /*在频点等待一段时间*/
+        if(GetTickElaps(LastResyncTime) < GetFH_TraverseTime())
+            return;
+        
+        LastResyncTime = millis();
+        
         CntRxCom++;
         CntRxResync++;
-        LastRxTime = tick;
+
         FH_JumpNext();
-        FH_WaitResync = true;
     }
 }
 
 void NRF_Manager::MasterDuplexHandle()
 {
     if(GetTickElaps(LastTxTime) < IntervalTime)
-    {
         return;
-    }
     
     LastTxTime = millis();
 
@@ -248,65 +255,110 @@ void NRF_Manager::MasterDuplexHandle()
 
 void NRF_Manager::SlaveDuplexHandle()
 {
-    uint8_t status = Basic->GetStatus();
-    
-    uint32_t tick = millis();
-    
+    /*接收状态*/
     if(Basic->RF_State == Basic->RF_State_RX)
     {
+        /*如果收到数据包*/
         if(Basic->Recv(RxBuffer))
-        {
+        {   
+            /*请求发送*/
             TxReq = true;
+            
+            /*通信计数*/
             CntRxCom++;
             CntRxSuccess++;
-            LastRxTime = tick;
-            FH_WaitTime = IntervalTime * 2 + IntervalTime;
             
+            /*记录当前接收的时间*/
+            LastRxTime = millis();
+            
+            /*设置在当前频点等待的时间*/
+            FH_WaitTime = IntervalTime * 2 - IntervalTime / 5;
+            
+            /*设定最长发送等待时间*/
+            TxWaitTime = IntervalTime / 2 + IntervalTime % 2;
+            
+            /*关闭重新同步*/
             FH_WaitResync = false;
             
             LED_SetEnable(LED_RX, false);
         }
-        else if(!FH_WaitResync && GetTickElaps(FH_LastTime) >= FH_WaitTime)
+        /*如果未请求发送，并且没有重新同步等待，并且在当前频点等待时间超时*/
+        else if(!TxReq && !FH_WaitResync && GetTickElaps(FH_LastTime) >= FH_WaitTime)
         {
+            /*请求发送，在发送完成后跳频*/
             TxReq = true;
+            
+            /*通信计数*/
             CntRxCom++;
             CntRxForceFH++;
-            FH_LastTime = millis();
-            FH_WaitTime = IntervalTime * 2;
+            
+            /*不允许发送等待太久*/
+            TxWaitTime = 1;
         }
-        else if(GetTickElaps(LastRxTime) >= (IntervalTime * 2) * (FH_List_Length + 1))
+        /*如果掉线超过遍历一次跳频表的时间，则认为通信中断，需重新进行同步*/
+        else if(GetTickElaps(LastRxTime) > GetFH_TraverseTime())
         {
+            /*标记为重新同步状态*/
+            FH_WaitResync = true;
+            
+            /*在频点等待一段时间*/
+            if(GetTickElaps(LastResyncTime) < GetFH_TraverseTime())
+                return;
+            
+            LastResyncTime = millis();
+            
+            /*通信计数*/
             CntRxCom++;
             CntRxResync++;
-            LastRxTime = tick;
+            
+            /*跳频*/
             FH_JumpNext();
-            FH_WaitResync = true;
         }
         
-        if(TxReq && GetTickElaps(LastRxTime) > IntervalTime)
+        /*处理发送请求，并且距离上一次接收超过半个通信周期*/
+        if(TxReq && GetTickElaps(LastRxTime) >= IntervalTime)
         {
-            TxReq = false;
+            /*设为发送状态*/
             Basic->TX_Mode();
+            
+            /*发送数据包*/
             Basic->Tran(TxBuffer);
-            LastTxTime = tick;
+            
+            /*记录发送时间*/
+            LastTxTime = millis();
+            
+            /*已处理发送请求*/
+            TxReq = false;
+            
             LED_SetEnable(LED_TX, true);
         }
     }
+    /*发送状态*/
     else if(Basic->RF_State == Basic->RF_State_TX)
-    {
+    {   
+        /*获取NRF状态*/
+        uint8_t status = Basic->GetStatus();
+        
+        /*发送成功，或发送失败，或发送超时*/
         if( status & Basic->TX_DS || 
             status & Basic->MAX_RT ||
-            GetTickElaps(LastTxTime) >= (IntervalTime - 1)
+            GetTickElaps(LastTxTime) >= TxWaitTime
         )
         {
+            /*发送成功记录*/
             if(status & Basic->TX_DS)
             {
                 Basic->CntTxSuccess++;
             }
+            
             LED_SetEnable(LED_TX, false);
             
+            /*跳频，要比主机先达到新频点*/
             FH_JumpNext();
+            
+            /*切接收模式*/
             Basic->RX_Mode();
+            
             LED_SetEnable(LED_RX, true);
         }
     }
@@ -314,30 +366,58 @@ void NRF_Manager::SlaveDuplexHandle()
 
 void NRF_Manager::Handle()
 {
-    LED_SetEnable(LED_STA2, (Basic->RF_State == Basic->RF_State_TX));
-
+    /*处理模式更新请求*/
+    if(ModeUpdateReq)
+    {
+        LED_SetEnable(LED_STA1, false);
+        Basic->SetFreqency(FH_List[FH_List_Index]);
+        if(Role == Role_Master)
+        {
+            Basic->TX_Mode(true);
+        }
+        else if(Role == Role_Slave)
+        {
+            Basic->RX_Mode(true);
+        }
+        ModeUpdateReq = false;
+    }
+    
+    /*主机*/
     if(Role == Role_Master)
     {
-        if(Mode == Mode_Simplex && TxBuffer != NULL)
+        if(TxBuffer == NULL)
+            return;
+        
+        if(Mode == Mode_Simplex)
         {
+            /*单工*/
             MasterSimplexHandle();
         }
-        else if(Mode == Mode_Duplex && TxBuffer != NULL && RxBuffer != NULL)
+        else if(Mode == Mode_Duplex && RxBuffer != NULL)
         {
+            /*双工*/
             MasterDuplexHandle();
         }
     }
+    /*从机*/
     else if(Role == Role_Slave)
     {
-        if(Mode == Mode_Simplex && RxBuffer != NULL)
+        if(RxBuffer == NULL)
+            return;
+        
+        if(Mode == Mode_Simplex)
         {
+            /*单工*/
             SlaveSimplexHandle();
         }
-        else if(Mode == Mode_Duplex && RxBuffer != NULL && TxBuffer != NULL)
+        else if(Mode == Mode_Duplex && TxBuffer != NULL)
         {
+            /*双工*/
             SlaveDuplexHandle();
         }
     }
+    
+    LED_SetEnable(LED_STA2, (Basic->RF_State == Basic->RF_State_TX));
 }
 
 void NRF_Manager::IRQ_Handle()

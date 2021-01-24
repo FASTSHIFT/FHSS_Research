@@ -5,7 +5,6 @@
 
 class NRF_Manager
 {
-    typedef void(*TimeSetCallbackFunc_t)(uint32_t);
 public:
     NRF_Manager(NRF_Basic* nrf);
     NRF_Basic* Basic;
@@ -16,14 +15,6 @@ public:
         Role_Slave,
     } Role_Type;
     Role_Type Role;
-
-    typedef enum
-    {
-        State_TX,
-        State_RX,
-        State_WAIT,
-    } State_Type;
-    State_Type State;
 
     typedef enum
     {
@@ -38,9 +29,9 @@ public:
     void SetTxBuffer(void* txbuff, uint16_t len);
     void SetRxBuffer(void* rxbuff, uint16_t len);
     void SetFreqHoppingList(const uint8_t* list, uint16_t length);
-    void SetInterruptTimeCallback(TimeSetCallbackFunc_t func);
 
     bool GetFH_Enable();
+    uint16_t GetFH_TraverseTime();
     void GetRxCnts(uint32_t* rxSuc, uint32_t* forceFH, uint32_t* resync);
     uint8_t GetRxPackLoss();
     uint32_t GetTickElaps(uint32_t prevTick);
@@ -51,13 +42,16 @@ public:
 
 private:
     uint16_t IntervalTime;
+    uint16_t TxWaitTime;
     uint32_t LastRxTime;
     uint32_t LastTxTime;
+    uint32_t LastResyncTime;
     
     uint8_t* TxBuffer;
     uint8_t* RxBuffer;
 
     bool TxReq;
+    bool ModeUpdateReq;
 
     bool FH_Enable;
     bool FH_WaitResync;

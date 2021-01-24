@@ -13,7 +13,8 @@ uint8_t NRF2_TxBuff[COM_BUFFER_LEN];
 /*NRF2接收数据缓冲区*/
 uint8_t NRF2_RxBuff[COM_BUFFER_LEN];
 
-uint8_t FreqHoppingList[] = {50, 60, 70, 80, 90, 100, 110, 120, 125};
+//const uint8_t FreqHoppingList[] = {50, 60, 70, 80, 90, 100, 110, 120, 125};
+const uint8_t FreqHoppingList[] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45};
 
 /*跳频收发管理器*/
 NRF_Manager nrf1_Mag(&nrf1);

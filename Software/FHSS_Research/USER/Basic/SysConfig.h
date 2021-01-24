@@ -3,7 +3,7 @@
 
 #define SYS_NAME              "FHSS_Research"
 #define SYS_HARDWARE_VERSION  "v1.0"
-#define SYS_SOFTWARE_VERSION  "v1.3"
+#define SYS_SOFTWARE_VERSION  "v1.4"
 
 /*¿ÕÒý½Å*/
 #define NULL_PIN            PD0
